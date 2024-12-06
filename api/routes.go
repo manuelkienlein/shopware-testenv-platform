@@ -3,24 +3,26 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/shopwareLabs/testenv-platform/api/handler"
+	"github.com/shopwareLabs/testenv-platform/services"
 )
 
 func RegisterRoutes(e *echo.Echo) {
-	// API-Gruppe
+
+	// Init services
+	dockerService, err := services.NewDockerService()
+	if err != nil {
+		e.Logger.Fatalf("Failed to create Docker service: %v", err)
+	}
+
+	// Init handlers
+	sandboxHandler := handler.NewSandboxHandler(dockerService)
+
+	// Add api handlers
 	api := e.Group("/api")
 
 	api.GET("/health", handler.HealthCheckHandler)
 
-	api.GET("/sandboxes", handler.ListSandboxesHandler)
-	api.POST("/sandboxes", handler.CreateSandboxHandler)
-	api.DELETE("/sandboxes/:id", handler.DeleteSandboxHandler)
-
-	/*// Beispielroute: GET /api/health
-	api.GET("/health", handlers.HealthCheckHandler)
-
-	// Beispielroute: GET /api/users/:id
-	api.GET("/users/:id", handlers.GetUserHandler)
-
-	// Beispielroute: POST /api/users
-	api.POST("/users", handlers.CreateUserHandler)*/
+	api.GET("/sandboxes", sandboxHandler.ListSandboxesHandler)
+	api.POST("/sandboxes", sandboxHandler.CreateSandboxHandler)
+	api.DELETE("/sandboxes/:id", sandboxHandler.DeleteSandboxHandler)
 }

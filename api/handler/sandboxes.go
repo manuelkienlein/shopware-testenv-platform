@@ -1,19 +1,22 @@
 package handler
 
 import (
-	"context"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
-	containertypes "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
-	"io"
+	"github.com/shopwareLabs/testenv-platform/services"
 	"log"
 	"net/http"
-	"os"
-	"time"
 )
+
+type SandboxHandler struct {
+	DockerService *services.DockerService
+}
+
+func NewSandboxHandler(dockerService *services.DockerService) *SandboxHandler {
+	return &SandboxHandler{
+		DockerService: dockerService,
+	}
+}
 
 type ContainerInfo struct {
 	ID        string `json:"id"`
@@ -25,118 +28,56 @@ type ContainerInfo struct {
 }
 
 // ListContainers listet alle Docker-Container auf
-func ListSandboxesHandler(c echo.Context) error {
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+func (h *SandboxHandler) ListSandboxesHandler(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	containerInfos, err := h.DockerService.ListContainers(ctx)
 	if err != nil {
-		panic(err)
-	}
-	defer cli.Close()
-
-	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{})
-	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	fmt.Printf("Found %d containers\n", len(containers))
-	for _, container := range containers {
-		fmt.Printf("ID: %s, Image: %s, Status: %s\n", container.ID, container.Image, container.Status)
-	}
-
-	var containerInfos []ContainerInfo
-
-	for _, container := range containers {
-		// Hole die Startzeit des Containers
-		created := time.Unix(container.Created, 0).Format(time.RFC3339)
-
-		// Erstelle ein ContainerInfo Objekt mit den gewünschten Feldern
-		containerInfo := ContainerInfo{
-			ID:        container.ID,
-			Name:      container.Names[0], // Verwende den ersten Namen des Containers
-			Image:     container.Image,
-			CreatedAt: created,
-			State:     container.State,
-			Status:    container.Status,
-		}
-
-		// Füge das ContainerInfo Objekt zur Liste hinzu
-		containerInfos = append(containerInfos, containerInfo)
-	}
-
-	// JSON-Antwort zurückgeben
 	return c.JSON(http.StatusOK, containerInfos)
 }
 
-func CreateSandboxHandler(c echo.Context) error {
+func (h *SandboxHandler) CreateSandboxHandler(c echo.Context) error {
+	ctx := c.Request().Context()
 
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		panic(err)
-	}
-	defer cli.Close()
-
+	// Image und andere Daten
 	imageName := "dockware/dev:6.6.8.2"
-
-	out, err := cli.ImagePull(ctx, imageName, image.PullOptions{})
-	if err != nil {
-		panic(err)
-	}
-	defer out.Close()
-	io.Copy(os.Stdout, out)
-
 	instanceName := "randomString"
 	host := "randomString.sandboxes.localhost"
-	labels := map[string]string{
-		"sandbox_container": "true",
-		"traefik.enable":    "true",
-		fmt.Sprintf("traefik.http.routers.http-%s.rule", instanceName):        fmt.Sprintf("Host(`%s`)", host),
-		fmt.Sprintf("traefik.http.routers.http-%s.entrypoints", instanceName): "web",
-	}
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image:  imageName,
-		Labels: labels,
-	}, nil, nil, nil, instanceName)
+	containerID, err := h.DockerService.CreateContainer(ctx, imageName, instanceName, host)
 	if err != nil {
-		panic(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
-		panic(err)
-	}
-
-	fmt.Println(resp.ID)
-
-	return c.JSON(http.StatusOK, map[string]interface{}{})
+	log.Printf("Created container with ID: %s", containerID)
+	return c.JSON(http.StatusOK, map[string]interface{}{"container_id": containerID})
 }
 
-func DeleteSandboxHandler(c echo.Context) error {
+func (h *SandboxHandler) DeleteSandboxHandler(c echo.Context) error {
 
-	id := c.Param("id")
-	log.Println("Stopping sandbox container " + id)
+	ctx := c.Request().Context()
 
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		panic(err)
-	}
-	defer cli.Close()
+	containerID := c.Param("id")
+	log.Println("Stopping sandbox container " + containerID)
 
-	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{})
+	containerInfos, err := h.DockerService.ListContainers(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, container := range containers {
-		fmt.Println(container.Names[0])
+	for _, container := range containerInfos {
+		fmt.Println(container.Name)
 		// TODO: Only delete container based on ID
-		if container.Names[0] == "/shopware_6.6" {
+		if container.Name == "/shopware_6.6" {
 			fmt.Print("Stopping container ", container.ID[:10], "... ")
-			noWaitTimeout := 0 // to not wait for the container to exit gracefully
-			if err := cli.ContainerStop(ctx, container.ID, containertypes.StopOptions{Timeout: &noWaitTimeout}); err != nil {
-				panic(err)
+
+			if err := h.DockerService.StopContainer(ctx, container.ID); err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 			}
+
 			fmt.Println("Success")
 		}
 	}
