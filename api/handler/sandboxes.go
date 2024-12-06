@@ -6,6 +6,7 @@ import (
 	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 	"time"
 )
@@ -63,6 +64,39 @@ func ListSandboxesHandler(c echo.Context) error {
 }
 
 func CreateSandboxHandler(c echo.Context) error {
+
+	return c.JSON(http.StatusOK, map[string]interface{}{})
+}
+
+func DeleteSandboxHandler(c echo.Context) error {
+
+	id := c.Param("id")
+	log.Println("Stopping sandbox container " + id)
+
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
+	defer cli.Close()
+
+	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	for _, container := range containers {
+		fmt.Println(container.Names[0])
+		// TODO: Only delete container based on ID
+		if container.Names[0] == "/shopware_6.6" {
+			fmt.Print("Stopping container ", container.ID[:10], "... ")
+			noWaitTimeout := 0 // to not wait for the container to exit gracefully
+			if err := cli.ContainerStop(ctx, container.ID, containertypes.StopOptions{Timeout: &noWaitTimeout}); err != nil {
+				panic(err)
+			}
+			fmt.Println("Success")
+		}
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{})
 }

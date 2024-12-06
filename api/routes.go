@@ -13,6 +13,7 @@ func RegisterRoutes(e *echo.Echo) {
 
 	api.GET("/sandboxes", handler.ListSandboxesHandler)
 	api.POST("/sandboxes", handler.CreateSandboxHandler)
+	api.DELETE("/sandboxes/:id", handler.DeleteSandboxHandler)
 
 	/*// Beispielroute: GET /api/health
 	api.GET("/health", handlers.HealthCheckHandler)
