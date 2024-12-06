@@ -27,7 +27,14 @@ type ContainerInfo struct {
 	Status    string `json:"status"`
 }
 
-// ListContainers listet alle Docker-Container auf
+// List all sandbox environments
+// @Summary List sandbox environments
+// @Description List sandbox environments
+// @Tags Sandbox Management
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} ContainerInfo
+// @Router /api/sandboxes [get]
 func (h *SandboxHandler) ListSandboxesHandler(c echo.Context) error {
 	ctx := c.Request().Context()
 
