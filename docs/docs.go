@@ -39,6 +39,162 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/images": {
+            "get": {
+                "description": "Get a list of docker image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker Image Management"
+                ],
+                "summary": "List of Docker Image",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/images.Image"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Pulls a docker image and register it into the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker Image Management"
+                ],
+                "summary": "Pull Docker Image",
+                "parameters": [
+                    {
+                        "description": "Image Input",
+                        "name": "image",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/images.PullImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/images.PullImageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/images/{id}": {
+            "get": {
+                "description": "Get details about a docker image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker Image Management"
+                ],
+                "summary": "Details about a Docker Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Image ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/images.Image"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Removes a docker image form the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Docker Image Management"
+                ],
+                "summary": "Remove Docker Image",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Image ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/images.ImageDeleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/sandboxes": {
             "get": {
                 "description": "List sandbox environments",
@@ -65,7 +221,6 @@ const docTemplate = `{
     },
     "definitions": {
         "handler.ContainerInfo": {
-            "description": "Information about a sandbox container",
             "type": "object",
             "properties": {
                 "created_at": {
@@ -85,6 +240,70 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "images.Image": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2013-08-20T18:52:09.000Z"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "a407dee395ed"
+                },
+                "image_name": {
+                    "type": "string",
+                    "example": "dockware/dev"
+                },
+                "image_tag": {
+                    "type": "string",
+                    "example": "6.6.8.2"
+                },
+                "size": {
+                    "type": "integer",
+                    "example": 1048576
+                }
+            }
+        },
+        "images.ImageDeleteResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Docker Image removed successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
+        "images.PullImageRequest": {
+            "type": "object",
+            "properties": {
+                "image_name": {
+                    "type": "string",
+                    "example": "dockware/dev"
+                },
+                "image_tag": {
+                    "type": "string",
+                    "example": "6.6.8.2"
+                }
+            }
+        },
+        "images.PullImageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Docker Image created successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
                 }
             }
         }
