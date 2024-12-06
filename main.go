@@ -1,16 +1,38 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/shopwareLabs/testenv-platform/handler"
+	"errors"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/shopwareLabs/testenv-platform/api"
 	"log"
 	"net/http"
 )
 
 func main() {
-	go handler.PullImageUpdatesTask()
+	//go handler.PullImageUpdatesTask()
 
-	router := httprouter.New()
+	e := echo.New()
+
+	// Middleware
+	e.Use(middleware.Logger())  // Logt Anfragen
+	e.Use(middleware.Recover()) // Fängt Panics ab und gibt 500 zurück
+
+	// Register routes
+	api.RegisterRoutes(e)
+
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	// Start server
+	port := ":8080"
+	log.Printf("Starting server on http://localhost%s", port)
+	if err := e.Start(port); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatalf("Could not start server: %v", err)
+	}
+
+	/*router := httprouter.New()
 
 	router.GET("/", handler.Info)
 
@@ -20,5 +42,5 @@ func main() {
 	router.DELETE("/environments", handler.DeleteContainer)
 
 	log.Println("Go!")
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", router))*/
 }
