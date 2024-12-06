@@ -1,0 +1,52 @@
+definitions:
+  handler.ContainerInfo:
+    description: Information about a sandbox container
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      state:
+        type: string
+      status:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/health:
+    get:
+      consumes:
+      - '*/*'
+      description: Get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Show the status of server.
+      tags:
+      - System Management
+  /api/sandboxes:
+    get:
+      consumes:
+      - application/json
+      description: List sandbox environments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.ContainerInfo'
+      summary: List sandbox environments
+      tags:
+      - Sandbox Management
+swagger: "2.0"
