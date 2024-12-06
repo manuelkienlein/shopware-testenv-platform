@@ -3,11 +3,15 @@ package handler
 import (
 	"context"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
 	containertypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/labstack/echo/v4"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -64,6 +68,45 @@ func ListSandboxesHandler(c echo.Context) error {
 }
 
 func CreateSandboxHandler(c echo.Context) error {
+
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
+	defer cli.Close()
+
+	imageName := "dockware/dev:6.6.8.2"
+
+	out, err := cli.ImagePull(ctx, imageName, image.PullOptions{})
+	if err != nil {
+		panic(err)
+	}
+	defer out.Close()
+	io.Copy(os.Stdout, out)
+
+	instanceName := "randomString"
+	host := "randomString.sandboxes.localhost"
+	labels := map[string]string{
+		"sandbox_container": "true",
+		"traefik.enable":    "true",
+		fmt.Sprintf("traefik.http.routers.http-%s.rule", instanceName):        fmt.Sprintf("Host(`%s`)", host),
+		fmt.Sprintf("traefik.http.routers.http-%s.entrypoints", instanceName): "web",
+	}
+
+	resp, err := cli.ContainerCreate(ctx, &container.Config{
+		Image:  imageName,
+		Labels: labels,
+	}, nil, nil, nil, instanceName)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := cli.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
+		panic(err)
+	}
+
+	fmt.Println(resp.ID)
 
 	return c.JSON(http.StatusOK, map[string]interface{}{})
 }
