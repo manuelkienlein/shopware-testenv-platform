@@ -1,22 +1,15 @@
 package sandboxes
 
-import "github.com/shopwareLabs/testenv-platform/services"
+import (
+	"github.com/shopwareLabs/testenv-platform/services/sandbox"
+)
 
 type SandboxHandler struct {
-	DockerService *services.DockerService
+	SandboxService *sandbox.SandboxService
 }
 
-func NewSandboxHandler(dockerService *services.DockerService) *SandboxHandler {
+func NewSandboxHandler(sandboxService *sandbox.SandboxService) *SandboxHandler {
 	return &SandboxHandler{
-		DockerService: dockerService,
+		SandboxService: sandboxService,
 	}
-}
-
-type ContainerInfo struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Image     string `json:"image"`
-	CreatedAt string `json:"created_at"`
-	State     string `json:"state"`
-	Status    string `json:"status"`
 }

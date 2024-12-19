@@ -14,9 +14,10 @@ type SandboxCreateResponse struct {
 	Status        string `json:"status" example:"success"`
 	Message       string `json:"message" example:"Sandbox created successfully"`
 	Image         string `json:"image" example:"dockware/dev:6.6.8.2"`
-	ContainerName string `json:"container_name" example:"sandbox-container"`
-	ContainerId   string `json:"container_id" example:"sandbox-container-id"`
-	Url           string `json:"url" example:"https://sandbox-random.shopshredder.zion.mr-pixel.de"`
+	ContainerName string `json:"container_name" example:"sandbox-67777b4e-946f-4462-b689-3c608d2d7938"`
+	ContainerId   string `json:"container_id" example:"9a7f95b73018432cb88ebed68046c59a4bed05b2abc809f6fbf39a1173c06ac9"`
+	Url           string `json:"url" example:"https://sandbox-67777b4e-946f-4462-b689-3c608d2d7938.shopshredder.zion.mr-pixel.de"`
+	SandboxId     string `json:"sandbox_id" example:"67777b4e-946f-4462-b689-3c608d2d7938"`
 }
 
 // SandboxCreateHandler creates a new sandbox for requested image
@@ -55,23 +56,22 @@ func (h *SandboxHandler) SandboxCreateHandler(c echo.Context) error {
 		})
 	}
 
-	// TODO: other data
+	// TODO: allow other images and validate input
 	imageName := "dockware/dev:6.6.8.2"
-	instanceName := "sandbox_random"
-	host := "sandbox-random.shopshredder.zion.mr-pixel.de"
 
-	containerID, err := h.DockerService.CreateContainer(ctx, imageName, instanceName, host)
+	sandbox, err := h.SandboxService.CreateSandbox(ctx, imageName)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create sandbox environment")
 	}
 
 	output := SandboxCreateResponse{
 		Message:       "Sandbox created successfully",
 		Status:        "success",
-		ContainerName: instanceName,
-		ContainerId:   containerID,
+		ContainerName: sandbox.ContainerName,
+		ContainerId:   sandbox.ContainerId,
 		Image:         imageName,
-		Url:           host,
+		Url:           sandbox.Url,
+		SandboxId:     sandbox.ID,
 	}
 
 	return c.JSON(http.StatusOK, output)
