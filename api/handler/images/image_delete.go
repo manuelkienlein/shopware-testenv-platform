@@ -10,7 +10,7 @@ type ImageDeleteResponse struct {
 	Message string `json:"message" example:"Docker Image removed successfully"`
 }
 
-// ImageDeleteHandler removees a docker image
+// ImageDeleteHandler removes a docker image
 // @Summary Remove Docker Image
 // @Description Removes a docker image form the system
 // @Tags Docker Image Management
@@ -25,7 +25,6 @@ func (h *ImageHandler) ImageDeleteHandler(c echo.Context) error {
 	containerID := c.Param("id")
 
 	// TODO implement
-
 	output := ImageDeleteResponse{
 		Message: "Image " + containerID + " removed successfully",
 		Status:  "success",

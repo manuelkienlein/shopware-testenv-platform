@@ -212,7 +212,98 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.ContainerInfo"
+                            "$ref": "#/definitions/sandboxes.ContainerInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new sandbox docker container",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sandbox Management"
+                ],
+                "summary": "Create new sandbox",
+                "parameters": [
+                    {
+                        "description": "Image Input",
+                        "name": "image",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sandboxes.SandboxCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sandboxes.SandboxCreateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sandboxes/{id}": {
+            "delete": {
+                "description": "Removes a sandbox docker container",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sandbox Management"
+                ],
+                "summary": "Remove Sandbox Environment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Container ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sandboxes.SandboxDeleteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -220,29 +311,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.ContainerInfo": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "state": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
         "images.Image": {
             "type": "object",
             "properties": {
@@ -300,6 +368,84 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Docker Image created successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                }
+            }
+        },
+        "sandboxes.ContainerInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "sandboxes.SandboxCreateRequest": {
+            "type": "object",
+            "properties": {
+                "image_id": {
+                    "type": "string",
+                    "example": "dockware/dev"
+                },
+                "lifetime": {
+                    "type": "integer",
+                    "example": 1440
+                }
+            }
+        },
+        "sandboxes.SandboxCreateResponse": {
+            "type": "object",
+            "properties": {
+                "container_id": {
+                    "type": "string",
+                    "example": "sandbox-container-id"
+                },
+                "container_name": {
+                    "type": "string",
+                    "example": "sandbox-container"
+                },
+                "image": {
+                    "type": "string",
+                    "example": "dockware/dev:6.6.8.2"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Sandbox created successfully"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "success"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "https://sandbox-random.shopshredder.zion.mr-pixel.de"
+                }
+            }
+        },
+        "sandboxes.SandboxDeleteResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Docker Image removed successfully"
                 },
                 "status": {
                     "type": "string",

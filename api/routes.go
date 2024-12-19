@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/shopwareLabs/testenv-platform/api/handler"
 	"github.com/shopwareLabs/testenv-platform/api/handler/images"
+	"github.com/shopwareLabs/testenv-platform/api/handler/sandboxes"
 	_ "github.com/shopwareLabs/testenv-platform/docs"
 	"github.com/shopwareLabs/testenv-platform/services"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -25,7 +26,7 @@ func RegisterRoutes(e *echo.Echo) {
 	}
 
 	// Init handlers
-	sandboxHandler := handler.NewSandboxHandler(dockerService)
+	sandboxHandler := sandboxes.NewSandboxHandler(dockerService)
 	imageHandler := images.NewImageHandler(dockerService)
 
 	// Add api handlers
@@ -34,9 +35,9 @@ func RegisterRoutes(e *echo.Echo) {
 	api.GET("/health", handler.HealthCheckHandler)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	api.GET("/sandboxes", sandboxHandler.ListSandboxesHandler)
-	api.POST("/sandboxes", sandboxHandler.CreateSandboxHandler)
-	api.DELETE("/sandboxes/:id", sandboxHandler.DeleteSandboxHandler)
+	api.GET("/sandboxes", sandboxHandler.SandboxListHandler)
+	api.POST("/sandboxes", sandboxHandler.SandboxCreateHandler)
+	api.DELETE("/sandboxes/:id", sandboxHandler.SandboxDeleteHandler)
 
 	api.GET("/images", imageHandler.ImageListHandler)
 	api.GET("/images/:id", imageHandler.ImageDetailsHandler)

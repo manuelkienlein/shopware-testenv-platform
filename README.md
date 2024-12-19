@@ -59,3 +59,9 @@ Response
     "success": true
 }
 ```
+
+
+# Swagger Docs
+```
+swag init
+```

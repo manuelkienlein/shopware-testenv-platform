@@ -1,19 +1,4 @@
 definitions:
-  handler.ContainerInfo:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      image:
-        type: string
-      name:
-        type: string
-      state:
-        type: string
-      status:
-        type: string
-    type: object
   images.Image:
     properties:
       created_at:
@@ -54,6 +39,60 @@ definitions:
     properties:
       message:
         example: Docker Image created successfully
+        type: string
+      status:
+        example: success
+        type: string
+    type: object
+  sandboxes.ContainerInfo:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      state:
+        type: string
+      status:
+        type: string
+    type: object
+  sandboxes.SandboxCreateRequest:
+    properties:
+      image_id:
+        example: dockware/dev
+        type: string
+      lifetime:
+        example: 1440
+        type: integer
+    type: object
+  sandboxes.SandboxCreateResponse:
+    properties:
+      container_id:
+        example: sandbox-container-id
+        type: string
+      container_name:
+        example: sandbox-container
+        type: string
+      image:
+        example: dockware/dev:6.6.8.2
+        type: string
+      message:
+        example: Sandbox created successfully
+        type: string
+      status:
+        example: success
+        type: string
+      url:
+        example: https://sandbox-random.shopshredder.zion.mr-pixel.de
+        type: string
+    type: object
+  sandboxes.SandboxDeleteResponse:
+    properties:
+      message:
+        example: Docker Image removed successfully
         type: string
       status:
         example: success
@@ -192,8 +231,68 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.ContainerInfo'
+            $ref: '#/definitions/sandboxes.ContainerInfo'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       summary: List sandbox environments
+      tags:
+      - Sandbox Management
+    post:
+      consumes:
+      - application/json
+      description: Creates a new sandbox docker container
+      parameters:
+      - description: Image Input
+        in: body
+        name: image
+        required: true
+        schema:
+          $ref: '#/definitions/sandboxes.SandboxCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sandboxes.SandboxCreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create new sandbox
+      tags:
+      - Sandbox Management
+  /api/sandboxes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a sandbox docker container
+      parameters:
+      - description: Container ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sandboxes.SandboxDeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Remove Sandbox Environment
       tags:
       - Sandbox Management
 swagger: "2.0"
