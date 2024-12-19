@@ -42,6 +42,7 @@ func RegisterRoutes(e *echo.Echo) {
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	api.GET("/sandboxes", sandboxHandler.SandboxListHandler)
+	api.GET("/sandboxes/:id", sandboxHandler.SandboxDetailsHandler)
 	api.POST("/sandboxes", sandboxHandler.SandboxCreateHandler)
 	api.DELETE("/sandboxes/:id", sandboxHandler.SandboxDeleteHandler)
 

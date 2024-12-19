@@ -58,7 +58,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/images.Image"
+                                "$ref": "#/definitions/github_com_shopwareLabs_testenv-platform_api_handler_images.Image"
                             }
                         }
                     },
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/images.Image"
+                            "$ref": "#/definitions/github_com_shopwareLabs_testenv-platform_api_handler_images.Image"
                         }
                     },
                     "400": {
@@ -213,7 +213,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/sandboxes.ContainerInfo"
+                            "$ref": "#/definitions/sandbox.SandboxInfo"
                         }
                     },
                     "400": {
@@ -270,6 +270,46 @@ const docTemplate = `{
             }
         },
         "/api/sandboxes/{id}": {
+            "get": {
+                "description": "Get details about a sandbox environment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sandbox Management"
+                ],
+                "summary": "Details about a Sandbox",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "example": "67777b4e-946f-4462-b689-3c608d2d7938",
+                        "description": "Sandbox ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sandbox.SandboxInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Removes a sandbox docker container",
                 "consumes": [
@@ -285,7 +325,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Container ID",
+                        "description": "Sandbox ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -312,7 +352,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "images.Image": {
+        "github_com_shopwareLabs_testenv-platform_api_handler_images.Image": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -376,9 +416,15 @@ const docTemplate = `{
                 }
             }
         },
-        "sandboxes.ContainerInfo": {
+        "sandbox.SandboxInfo": {
             "type": "object",
             "properties": {
+                "container_id": {
+                    "type": "string"
+                },
+                "container_name": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -388,13 +434,13 @@ const docTemplate = `{
                 "image": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "state": {
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -417,11 +463,11 @@ const docTemplate = `{
             "properties": {
                 "container_id": {
                     "type": "string",
-                    "example": "sandbox-container-id"
+                    "example": "9a7f95b73018432cb88ebed68046c59a4bed05b2abc809f6fbf39a1173c06ac9"
                 },
                 "container_name": {
                     "type": "string",
-                    "example": "sandbox-container"
+                    "example": "sandbox-67777b4e-946f-4462-b689-3c608d2d7938"
                 },
                 "image": {
                     "type": "string",
@@ -431,13 +477,17 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Sandbox created successfully"
                 },
+                "sandbox_id": {
+                    "type": "string",
+                    "example": "67777b4e-946f-4462-b689-3c608d2d7938"
+                },
                 "status": {
                     "type": "string",
                     "example": "success"
                 },
                 "url": {
                     "type": "string",
-                    "example": "https://sandbox-random.shopshredder.zion.mr-pixel.de"
+                    "example": "https://sandbox-67777b4e-946f-4462-b689-3c608d2d7938.shopshredder.zion.mr-pixel.de"
                 }
             }
         },

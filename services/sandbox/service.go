@@ -59,6 +59,35 @@ func (s *SandboxService) ListSandboxes(ctx context.Context) ([]SandboxInfo, erro
 	return sandboxInfos, nil
 }
 
+func (s *SandboxService) GetSandbox(ctx context.Context, sandboxId string) (SandboxInfo, error) {
+
+	sandbox, err := s.database.GetByID(sandboxId)
+	if err != nil {
+		log.Printf("Failed to fetch info for sandbox %s, because sandbox not found: %v", sandboxId, err)
+	}
+	containerId := sandbox.ContainerId
+
+	cont, err := s.client.ContainerInspect(ctx, containerId)
+	if err != nil {
+		return SandboxInfo{}, err
+	}
+
+	created := cont.Created
+
+	sandboxInfo := SandboxInfo{
+		ID:            cont.Config.Labels["sandbox_id"],
+		ContainerName: cont.Name,
+		ContainerId:   cont.ID,
+		Url:           cont.Config.Labels["sandbox_host"],
+		Image:         cont.Image,
+		CreatedAt:     created,
+		State:         cont.State.Status,
+		Status:        "up",
+	}
+
+	return sandboxInfo, nil
+}
+
 func (s *SandboxService) CreateSandbox(ctx context.Context, imageName string) (Sandbox, error) {
 
 	sandboxId := uuid.New().String()
@@ -68,7 +97,7 @@ func (s *SandboxService) CreateSandbox(ctx context.Context, imageName string) (S
 	// Pull docker container
 	out, err := s.client.ImagePull(ctx, imageName, image.PullOptions{})
 	if err != nil {
-		log.Fatal("Failed to pull sandbox docker container", err)
+		log.Print("Failed to pull sandbox docker container", err)
 		return Sandbox{}, err
 	}
 	defer out.Close()
@@ -93,7 +122,7 @@ func (s *SandboxService) CreateSandbox(ctx context.Context, imageName string) (S
 
 	// Start docker container
 	if err := s.client.ContainerStart(ctx, resp.ID, container.StartOptions{}); err != nil {
-		log.Fatal("Failed to start sandbox docker container", err)
+		log.Print("Failed to start sandbox docker container", err)
 		return Sandbox{}, err
 	}
 	log.Printf("Started sandbox %s with image %s", containerName, imageName)
@@ -119,20 +148,20 @@ func (s *SandboxService) DeleteSandbox(ctx context.Context, sandboxId string) {
 	// Find containerId for sandboxId
 	sandbox, err := s.database.GetByID(sandboxId)
 	if err != nil {
-		log.Fatalf("Failed to delete sandbox %s, because sandbox not found: %v", sandboxId, err)
+		log.Printf("Failed to delete sandbox %s, because sandbox not found: %v", sandboxId, err)
 	}
 
 	// Stop sandbox container
 	noWaitTimeout := 0 // to not wait for the container to exit gracefully
 	err = s.client.ContainerStop(ctx, sandbox.ContainerId, container.StopOptions{Timeout: &noWaitTimeout})
 	if err != nil {
-		log.Fatalf("Failed to stop sandbox container %s: %v", sandbox.ContainerName, err)
+		log.Printf("Failed to stop sandbox container %s: %v", sandbox.ContainerName, err)
 	}
 
 	// Remove sandbox from database
 	err = s.database.Remove(sandboxId)
 	if err != nil {
-		log.Fatalf("Failed to delete sandbox %s in database: %v", sandboxId, err)
+		log.Printf("Failed to delete sandbox %s in database: %v", sandboxId, err)
 	}
 }
 
