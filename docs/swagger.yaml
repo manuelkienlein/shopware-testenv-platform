@@ -5,7 +5,7 @@ definitions:
         example: "2013-08-20T18:52:09.000Z"
         type: string
       id:
-        example: a407dee395ed
+        example: a407dee395ed97ead1e40c7537395d6271c07cc89c317f8eda1c19f6fc783695
         type: string
       image_name:
         example: dockware/dev
@@ -200,6 +200,7 @@ paths:
       description: Get details about a docker image
       parameters:
       - description: Image ID
+        example: a407dee395ed97ead1e40c7537395d6271c07cc89c317f8eda1c19f6fc783695
         in: path
         name: id
         required: true

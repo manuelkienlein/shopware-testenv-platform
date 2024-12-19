@@ -131,6 +131,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "example": "a407dee395ed97ead1e40c7537395d6271c07cc89c317f8eda1c19f6fc783695",
                         "description": "Image ID",
                         "name": "id",
                         "in": "path",
@@ -320,7 +321,7 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string",
-                    "example": "a407dee395ed"
+                    "example": "a407dee395ed97ead1e40c7537395d6271c07cc89c317f8eda1c19f6fc783695"
                 },
                 "image_name": {
                     "type": "string",
