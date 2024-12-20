@@ -27,19 +27,19 @@ func RegisterRoutes(e *echo.Echo) {
 		e.Logger.Fatalf("Failed to create Docker service: %v", err)
 	}
 
-	sandboxService, err := sandbox.NewSandboxService()
-	if err != nil {
-		e.Logger.Fatalf("Failed to create Sandbox service: %v", err)
-	}
-
 	imageService, err := images2.NewImageService()
 	if err != nil {
 		e.Logger.Fatalf("Failed to create Image service: %v", err)
 	}
 
+	sandboxService, err := sandbox.NewSandboxService(imageService)
+	if err != nil {
+		e.Logger.Fatalf("Failed to create Sandbox service: %v", err)
+	}
+
 	// Init handlers
-	sandboxHandler := sandboxes.NewSandboxHandler(sandboxService)
 	imageHandler := images.NewImageHandler(dockerService, imageService)
+	sandboxHandler := sandboxes.NewSandboxHandler(sandboxService)
 
 	// Add api handlers
 	api := e.Group("/api")

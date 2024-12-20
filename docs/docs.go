@@ -58,7 +58,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_shopwareLabs_testenv-platform_api_handler_images.Image"
+                                "$ref": "#/definitions/images.Image"
                             }
                         }
                     },
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_shopwareLabs_testenv-platform_api_handler_images.Image"
+                            "$ref": "#/definitions/images.Image"
                         }
                     },
                     "400": {
@@ -352,7 +352,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_shopwareLabs_testenv-platform_api_handler_images.Image": {
+        "images.Image": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -448,9 +448,9 @@ const docTemplate = `{
         "sandboxes.SandboxCreateRequest": {
             "type": "object",
             "properties": {
-                "image_id": {
+                "image_name": {
                     "type": "string",
-                    "example": "dockware/dev"
+                    "example": "dockware/dev:6.6.8.2"
                 },
                 "lifetime": {
                     "type": "integer",

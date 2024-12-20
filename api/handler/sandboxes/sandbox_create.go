@@ -2,12 +2,13 @@ package sandboxes
 
 import (
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
 type SandboxCreateRequest struct {
-	ImageId  string `json:"image_id" example:"dockware/dev"`
-	Lifetime int    `json:"lifetime" example:"1440"`
+	ImageName string `json:"image_name" example:"dockware/dev:6.6.8.2"`
+	Lifetime  int    `json:"lifetime" example:"1440"`
 }
 
 type SandboxCreateResponse struct {
@@ -56,11 +57,11 @@ func (h *SandboxHandler) SandboxCreateHandler(c echo.Context) error {
 		})
 	}
 
-	// TODO: allow other images and validate input
-	imageName := "dockware/dev:6.6.8.2"
+	imageName := input.ImageName
 
 	sandbox, err := h.SandboxService.CreateSandbox(ctx, imageName)
 	if err != nil {
+		log.Printf("Failed to create sandbox %s: %v", imageName, err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create sandbox environment")
 	}
 

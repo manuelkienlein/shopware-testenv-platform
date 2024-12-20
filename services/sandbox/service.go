@@ -2,11 +2,13 @@ package sandbox
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
+	"github.com/shopwareLabs/testenv-platform/services/images"
 	"io"
 	"log"
 	"os"
@@ -14,18 +16,20 @@ import (
 )
 
 type SandboxService struct {
-	database *SandboxDatabase
-	client   *client.Client
+	database     *SandboxDatabase
+	client       *client.Client
+	imageService *images.ImageService
 }
 
-func NewSandboxService() (*SandboxService, error) {
+func NewSandboxService(imageService *images.ImageService) (*SandboxService, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
 	}
 	return &SandboxService{
-		database: NewSandboxDatabase(),
-		client:   cli,
+		database:     NewSandboxDatabase(),
+		client:       cli,
+		imageService: imageService,
 	}, nil
 }
 
@@ -93,6 +97,11 @@ func (s *SandboxService) CreateSandbox(ctx context.Context, imageName string) (S
 	sandboxId := uuid.New().String()
 	containerName := "sandbox-" + sandboxId
 	hostname := containerName + ".shopshredder.zion.mr-pixel.de"
+
+	// Check if image is on whitelist
+	if !s.imageService.Whitelist.IsAllowed(imageName) {
+		return Sandbox{}, errors.New("Image " + imageName + " is not on whitelist")
+	}
 
 	// Pull docker container
 	out, err := s.client.ImagePull(ctx, imageName, image.PullOptions{})
