@@ -2,6 +2,7 @@ package images
 
 import (
 	"github.com/labstack/echo/v4"
+	"log"
 	"net/http"
 )
 
@@ -22,11 +23,17 @@ type ImageDeleteResponse struct {
 // @Router /api/images/{id} [delete]
 func (h *ImageHandler) ImageDeleteHandler(c echo.Context) error {
 
-	containerID := c.Param("id")
+	ctx := c.Request().Context()
+	imageId := c.Param("id")
 
-	// TODO implement
+	err := h.ImageService.DeleteImage(ctx, imageId)
+	if err != nil {
+		log.Printf("Failed to delete image: %v", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	output := ImageDeleteResponse{
-		Message: "Image " + containerID + " removed successfully",
+		Message: "Image " + imageId + " removed successfully",
 		Status:  "success",
 	}
 

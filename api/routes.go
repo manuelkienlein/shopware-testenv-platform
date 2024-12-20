@@ -7,6 +7,7 @@ import (
 	"github.com/shopwareLabs/testenv-platform/api/handler/sandboxes"
 	_ "github.com/shopwareLabs/testenv-platform/docs"
 	"github.com/shopwareLabs/testenv-platform/services"
+	images2 "github.com/shopwareLabs/testenv-platform/services/images"
 	"github.com/shopwareLabs/testenv-platform/services/sandbox"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -31,9 +32,14 @@ func RegisterRoutes(e *echo.Echo) {
 		e.Logger.Fatalf("Failed to create Sandbox service: %v", err)
 	}
 
+	imageService, err := images2.NewImageService()
+	if err != nil {
+		e.Logger.Fatalf("Failed to create Image service: %v", err)
+	}
+
 	// Init handlers
 	sandboxHandler := sandboxes.NewSandboxHandler(sandboxService)
-	imageHandler := images.NewImageHandler(dockerService)
+	imageHandler := images.NewImageHandler(dockerService, imageService)
 
 	// Add api handlers
 	api := e.Group("/api")

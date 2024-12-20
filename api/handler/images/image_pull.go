@@ -26,6 +26,7 @@ type PullImageResponse struct {
 // @Failure 400 {object} map[string]string
 // @Router /api/images [post]
 func (h *ImageHandler) PullImageHandler(c echo.Context) error {
+	ctx := c.Request().Context()
 	var input PullImageRequest
 
 	if err := c.Bind(&input); err != nil {
@@ -34,13 +35,14 @@ func (h *ImageHandler) PullImageHandler(c echo.Context) error {
 		})
 	}
 
-	if len(input.ImageName) > 5 {
+	if len(input.ImageName) < 5 {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": "Image name must be at least 5 characters long",
 		})
 	}
 
-	// TODO implement
+	imageName := input.ImageName + ":" + input.ImageTag
+	h.ImageService.PullImage(ctx, imageName)
 
 	output := PullImageResponse{
 		Message: "Image " + input.ImageName + ":" + input.ImageTag + " created successfully",
