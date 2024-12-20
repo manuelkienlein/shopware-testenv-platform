@@ -13,6 +13,7 @@ import logo from './assets/logo.png'
     <nav>
       <RouterLink to="/">Go to Home</RouterLink>
       <RouterLink to="/login">Go to Login</RouterLink>
+      <RouterLink to="/admin">Go to Admin</RouterLink>
     </nav>
   </header>
   <strong>Current route path:</strong> {{ $route.fullPath }}
