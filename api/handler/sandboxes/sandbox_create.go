@@ -33,7 +33,6 @@ type SandboxCreateResponse struct {
 // @Router /api/sandboxes [post]
 func (h *SandboxHandler) SandboxCreateHandler(c echo.Context) error {
 
-	// TODO implement
 	ctx := c.Request().Context()
 	var input SandboxCreateRequest
 
