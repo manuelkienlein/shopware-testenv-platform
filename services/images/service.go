@@ -24,8 +24,13 @@ func NewImageService() (*ImageService, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Load whitelist from file
+	whitelist := NewDockerImageWhitelist()
+	whitelist.LoadFromFile(imageWhitelistFile)
+
 	return &ImageService{
-		Whitelist: NewDockerImageWhitelist(),
+		Whitelist: whitelist,
 		client:    cli,
 	}, nil
 }
