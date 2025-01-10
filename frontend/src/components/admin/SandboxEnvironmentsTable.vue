@@ -3,6 +3,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from "primevue/button";
 import Tag from "primevue/tag"
+import SandboxService from "../../services/sandboxService.js"
 
 export default {
 
@@ -33,10 +34,10 @@ export default {
   // Methods are functions that mutate state and trigger updates.
   // They can be bound as event handlers in templates.
   methods: {
-    increment() {
-      this.count++
+    async loadData() {
+      this.sandboxes = await SandboxService.getAllSandboxes();
     },
-    getSeverity(sandbox) {
+    getStatus(sandbox) {
       switch (sandbox.state) {
         case 'running':
           return 'success';
@@ -54,6 +55,7 @@ export default {
   // This function will be called when the component is mounted.
   mounted() {
     console.log(`Loading sandbox table`)
+    this.loadData();
   }
 }
 </script>
@@ -64,7 +66,7 @@ export default {
       <template #header>
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xl font-bold">Sandbox Environments</span>
-          <Button icon="pi pi-refresh" rounded raised />
+          <Button icon="pi pi-refresh" rounded raised @click="loadData"/>
         </div>
       </template>
       <Column field="id" header="ID"></Column>
@@ -72,7 +74,7 @@ export default {
       <Column field="created_at" header="Created"></Column>
       <Column field="state" header="Status">
         <template #body="slotProps">
-          <Tag :value="slotProps.data.state" :severity="getSeverity(slotProps.data)" />
+          <Tag :value="slotProps.data.state" :severity="getStatus(slotProps.data)" />
         </template>
       </Column>
       <Column class="w-24 !text-end">

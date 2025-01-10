@@ -3,8 +3,8 @@ import {createRouter, createWebHistory} from 'vue-router'
 import StartView from "./views/StartView.vue";
 import LoginView from "./views/LoginView.vue";
 import AdminView from "./views/AdminView.vue";
-import AdminSandboxEnvironments from "./views/admin/AdminSandboxEnvironments.vue";
-import AdminSandboxImages from "./views/admin/AdminSandboxImages.vue";
+import AdminSandboxEnvironments from "./views/admin/AdminSandboxEnvironmentsView.vue";
+import AdminSandboxImages from "./views/admin/AdminSandboxImagesView.vue";
 
 const routes = [
     { path: '/', component: StartView },
