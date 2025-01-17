@@ -15,8 +15,12 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())  // Logt Anfragen
+	e.Use(middleware.Logger())  // Loggt Anfragen
 	e.Use(middleware.Recover()) // Fängt Panics ab und gibt 500 zurück
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"https://www.shopshredder.de", "http://localhost:5173"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	// Register routes
 	api.RegisterRoutes(e)
