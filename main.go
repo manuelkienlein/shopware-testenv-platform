@@ -19,7 +19,7 @@ func main() {
 	e.Use(middleware.Recover()) // Fängt Panics ab und gibt 500 zurück
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"https://www.shopshredder.de", "http://localhost:5173"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "Access-Control-Allow-Origin"},
 	}))
 
 	// Register routes
