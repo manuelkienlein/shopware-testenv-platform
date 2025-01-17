@@ -47,6 +47,10 @@ export default {
     },
     openSandboxWindow(data) {
       window.open(data.url, '_blank').focus();
+    },
+    async deleteSandbox(data) {
+      await SandboxService.deleteSandbox(data.id);
+      await this.loadData();
     }
   },
 
@@ -62,7 +66,7 @@ export default {
 
 <template>
   <div class="card">
-    <DataTable :value="this.sandboxes" tableStyle="min-width: 50rem">
+    <DataTable :value="sandboxes" tableStyle="min-width: 50rem">
       <template #header>
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xl font-bold">Sandbox Environments</span>
@@ -81,10 +85,16 @@ export default {
         <template #body="{ data }">
           <div class="flex /*flex-wrap*/ gap-1 justify-center">
             <Button icon="pi pi-arrow-right" @click="openSandboxWindow(data)" severity="secondary" rounded></Button>
-            <Button icon="pi pi-trash" severity="secondary" rounded></Button>
+            <Button icon="pi pi-trash" @click="deleteSandbox(data)" severity="secondary" rounded></Button>
           </div>
         </template>
       </Column>
+      <template #empty>
+        <div class="text-center text-gray-500">
+          <i class="pi pi-info-circle text-xl"></i>
+          <p>No data available!</p>
+        </div>
+      </template>
     </DataTable>
   </div>
 </template>

@@ -3,6 +3,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from "primevue/button";
 import Tag from "primevue/tag"
+import SandboxService from "../../services/sandboxService.js";
+import ImagesService from "../../services/imagesService.js";
 
 export default {
 
@@ -30,6 +32,9 @@ export default {
   // Methods are functions that mutate state and trigger updates.
   // They can be bound as event handlers in templates.
   methods: {
+    async loadData() {
+      this.images = await ImagesService.getAllImages();
+    },
     formatSize(bytes) {
       const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
       if (bytes === 0) return "0 Bytes";
@@ -44,6 +49,7 @@ export default {
   // This function will be called when the component is mounted.
   mounted() {
     console.log(`Loading images table`)
+    this.loadData();
   }
 }
 </script>
@@ -54,7 +60,7 @@ export default {
       <template #header>
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xl font-bold">Sandbox Images</span>
-          <Button icon="pi pi-refresh" rounded raised />
+          <Button icon="pi pi-refresh" rounded raised @click="loadData"/>
         </div>
       </template>
       <Column field="id" header="ID">
@@ -77,6 +83,12 @@ export default {
           </div>
         </template>
       </Column>
+      <template #empty>
+        <div class="text-center text-gray-500">
+          <i class="pi pi-info-circle text-xl"></i>
+          <p>No data available!</p>
+        </div>
+      </template>
     </DataTable>
   </div>
 </template>

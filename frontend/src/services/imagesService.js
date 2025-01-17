@@ -1,6 +1,6 @@
 import axios from "axios";
 
-class SandboxService {
+class ImagesService {
 
     constructor() {
         this.apiClient = axios.create({
@@ -12,26 +12,26 @@ class SandboxService {
         });
     }
 
-    async getAllSandboxes() {
-        const response = await this.apiClient.get("/api/sandboxes");
+    async getAllImages() {
+        const response = await this.apiClient.get("/api/images");
         console.log(response)
         return response.data;
     }
 
-    async deleteSandbox(id) {
-        const response = await this.apiClient.delete(`/api/sandboxes/${id}`);
+    async deleteImage(id) {
+        const response = await this.apiClient.delete(`/api/images/${id}`);
         return response.data;
     }
 
-    async createSandbox() {
+    async registerImage() {
         var data = {
-            "image_name": "dockware/dev:6.6.8.2",
-            "lifetime": 1440
+            "image_name": "dockware/dev",
+            "image_tag": "6.6.8.2"
         };
-        const response = await this.apiClient.post("/api/sandboxes", data);
+        const response = await this.apiClient.post("/api/images", data);
         return response.data;
     }
 
 }
 
-export default new SandboxService();
+export default new ImagesService();
