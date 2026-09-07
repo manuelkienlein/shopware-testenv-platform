@@ -22,6 +22,7 @@ const {
   activeSandboxes,
   loading: sandboxesLoading,
   busyIds,
+  healthBySandboxId,
   createSandbox,
   deleteSandbox,
   removeSandbox,
@@ -43,6 +44,10 @@ function getImageTitle(sandbox: Sandbox): string {
 
 function getImageThumbnail(sandbox: Sandbox): string | undefined {
   return resolveAssetUrl(getImageForSandbox(sandbox)?.thumbnailUrl)
+}
+
+function isSandboxReadyForOpen(sandbox: Sandbox): boolean {
+  return sandbox.status === 'running' && healthBySandboxId.value[sandbox.id]?.ready === true
 }
 
 function sandboxExtraActions(sandbox: Sandbox): CardAction[] {
@@ -143,6 +148,7 @@ async function handleDemo(imageId: string) {
               :thumbnail-url="getImageThumbnail(sandbox)"
               :extra-actions="sandboxExtraActions(sandbox)"
               :state-reason="sandbox.stateReason"
+              :actions-disabled="!isSandboxReadyForOpen(sandbox)"
               context="sandbox.card"
             />
           </ShredderAnimation>

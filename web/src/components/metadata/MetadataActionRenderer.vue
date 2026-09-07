@@ -66,6 +66,9 @@ function onClick(e: MouseEvent) {
     </AlertDialog>
   </template>
 
+  <Button v-else-if="disabled" type="button" :variant="variant" :size="size" disabled>
+    {{ item.label }}
+  </Button>
   <Button
     v-else
     as="a"
@@ -74,7 +77,6 @@ function onClick(e: MouseEvent) {
     :rel="target === '_blank' ? 'noopener noreferrer' : undefined"
     :variant="variant"
     :size="size"
-    :disabled="disabled"
   >
     {{ item.label }}
   </Button>
