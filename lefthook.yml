@@ -5,7 +5,7 @@ pre-commit:
       root: "web/"
       glob: "**/*.{ts,vue,js,css,json}"
       exclude: "node_modules/**"
-      run: npx prettier --write {staged_files}
+      run: pnpm exec prettier --write {staged_files}
       stage_fixed: true
 
     web-lint-fix:
@@ -13,7 +13,7 @@ pre-commit:
       root: "web/"
       glob: "**/*.{ts,vue,js}"
       exclude: "node_modules/**"
-      run: npx eslint --fix --no-warn-ignored {staged_files}
+      run: pnpm exec eslint --fix --no-warn-ignored {staged_files}
       stage_fixed: true
 
     api-format-fix:
@@ -37,13 +37,13 @@ pre-commit:
       root: "web/"
       glob: "**/*.{ts,vue,js}"
       exclude: "node_modules/**"
-      run: npx eslint --no-warn-ignored {staged_files}
+      run: pnpm exec eslint --no-warn-ignored {staged_files}
 
     web-typecheck:
       priority: 2
       root: "web/"
       glob: "**/*.{ts,vue}"
-      run: npx vue-tsc -b --noEmit
+      run: pnpm exec vue-tsc -b --noEmit
 
     api-lint:
       priority: 2

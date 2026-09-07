@@ -81,7 +81,7 @@ const primaryExtras = computed(() =>
         v-for="item in schemaActions"
         :key="item.key"
         :item="item"
-        :disabled="actionsDisabled ?? (sandbox.status !== 'running')"
+        :disabled="actionsDisabled ?? sandbox.status !== 'running'"
         class="min-w-0 flex-1"
       />
       <ActionButton
